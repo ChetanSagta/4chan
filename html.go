@@ -16,28 +16,24 @@ func parse_html(file_content string) error {
 		return err
 	}
 	_html := get_first_child_element(doc)
-	body := get_child_tag("body", _html)
+	body := get_child_tag(_html,"body")
 	if body == nil {
 		return err
 	}
-	// node := get_node_based_on_id(body, "opts-btn");
-	node := get_node_based_on_attr(body, "class", "stat-cell")
-	println("Node",node.Attr[0].Val)
-	// firstchild := body.FirstChild
-	// for temp := firstchild; temp != nil; temp = temp.NextSibling {
-	// 	if temp.Type == html.ElementNode{
-	// 		node:= get_node_based_on_id(temp,"hd");
-	// 		if node != nil {
-	// 			println(node.Data);
-	// 		} else{
-	// 			println("Element not found");
-	// 		}
-	// 	}
-	// }
+
+	boards:= get_node_based_on_id(body, "boards")
+	board_links := get_all_nodes_based_on_attr(boards, "class", "boardlink")
+
+	println("\n\nPrinting All 4chan boards")
+	for link:= board_links.Front(); link != nil; link = link.Next(){
+		temp_link := link.Value.(*html.Node)
+		println(temp_link.FirstChild.Data)
+	}
+
 	return nil
 }
 
-func get_child_tag(tagname string, root *html.Node) *html.Node {
+func get_child_tag(root *html.Node,tagname string) *html.Node {
 
 	firstChild := root.FirstChild
 	for temp := firstChild; temp != nil; temp = temp.NextSibling {
@@ -86,7 +82,7 @@ func get_all_sibling_element(root *html.Node) *list.List{
 }
 
 func get_node_based_on_attr(root *html.Node,attr_name string, attr_value string) *html.Node{
-
+ 
 	if root == nil{
 		return nil 
 	}
@@ -106,8 +102,27 @@ func get_node_based_on_attr(root *html.Node,attr_name string, attr_value string)
 	return nil
 }
 
-func get_node_based_on_id(node *html.Node, value string) *html.Node{
+func get_all_nodes_based_on_attr(root *html.Node,attr_name string, attr_value string) *list.List{
 
+	all_nodes:= list.New()
+	if root == nil{
+		return all_nodes
+	}
+
+	children := get_all_child_element(root)
+	for child := children.Front(); child != nil; child= child.Next(){
+		node := child.Value.(*html.Node)
+		for _,attr := range node.Attr{
+			if(attr.Key == attr_name && attr.Val == attr_value){
+				all_nodes.PushBack(node)
+			}
+		}
+		all_nodes.PushBackList(get_all_nodes_based_on_attr(node, attr_name, attr_value));
+	}
+	return all_nodes 
+}
+
+func get_node_based_on_id(node *html.Node, value string) *html.Node{
 	return get_node_based_on_attr(node, "id", value);
 }
 
