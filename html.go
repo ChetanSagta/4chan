@@ -8,29 +8,26 @@ import (
 	"golang.org/x/net/html"
 )
 
-func parse_html(file_content string) error {
+func get_html_from_file(file_content string) (*html.Node, error){
 
 	doc, err := html.Parse(strings.NewReader(file_content))
 	if err != nil {
 		fmt.Println("Error while parsing html document :", doc)
-		return err
+		return nil,err
 	}
-	_html := get_first_child_element(doc)
-	body := get_child_tag(_html,"body")
+	return get_first_child_element(doc),nil
+}
+
+func get_all_boards(root *html.Node) *list.List{
+
+	body := get_child_tag(root,"body")
 	if body == nil {
-		return err
+		return nil 
 	}
 
 	boards:= get_node_based_on_id(body, "boards")
-	board_links := get_all_nodes_based_on_attr(boards, "class", "boardlink")
-
-	println("\n\nPrinting All 4chan boards")
-	for link:= board_links.Front(); link != nil; link = link.Next(){
-		temp_link := link.Value.(*html.Node)
-		println(temp_link.FirstChild.Data)
-	}
-
-	return nil
+	board_list := get_all_nodes_based_on_attr(boards, "class", "boardlink")
+	return board_list
 }
 
 func get_child_tag(root *html.Node,tagname string) *html.Node {
@@ -40,8 +37,9 @@ func get_child_tag(root *html.Node,tagname string) *html.Node {
 		if temp.Type == html.ElementNode && temp.Data == tagname {
 			return temp
 		}
+
 	}
-	println("Couldn't find ", tagname, "in the tree")
+	println("Couldn't find \"",tagname,"\"in the tree")
 	return nil
 }
 
@@ -79,6 +77,15 @@ func get_all_sibling_element(root *html.Node) *list.List{
 		}
 	}
 	return elements
+}
+
+func get_attribute_value(node *html.Node, attrib_name string) string{
+		for _,attr := range node.Attr{
+			if(attr.Key == attrib_name){
+				return attr.Val 
+			}
+		}
+	return ""
 }
 
 func get_node_based_on_attr(root *html.Node,attr_name string, attr_value string) *html.Node{
