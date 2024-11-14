@@ -140,3 +140,11 @@ func print_attr(node *html.Node){
 	}
 
 }
+
+func get_file_url(root *html.Node) string{
+	file_tag := get_node_based_on_attr(root, "class", "file")
+	fileText_tag := get_node_based_on_attr(file_tag, "class", "fileText")
+	href := get_child_tag(fileText_tag, "a")
+	url := "http:"+ get_attribute_value(href, "href")
+	return url
+}
