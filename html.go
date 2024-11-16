@@ -8,9 +8,9 @@ import (
 	"golang.org/x/net/html"
 )
 
-func get_html_from_file(file_content string) (*html.Node, error){
+func get_html_from_string(content string) (*html.Node, error){
 
-	doc, err := html.Parse(strings.NewReader(file_content))
+	doc, err := html.Parse(strings.NewReader(content))
 	if err != nil {
 		fmt.Println("Error while parsing html document :", doc)
 		return nil,err
@@ -144,6 +144,9 @@ func print_attr(node *html.Node){
 func get_file_url(root *html.Node) string{
 	file_tag := get_node_based_on_attr(root, "class", "file")
 	fileText_tag := get_node_based_on_attr(file_tag, "class", "fileText")
+	if(fileText_tag == nil){
+		return ""
+	}
 	href := get_child_tag(fileText_tag, "a")
 	url := "http:"+ get_attribute_value(href, "href")
 	return url
