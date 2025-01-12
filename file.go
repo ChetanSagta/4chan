@@ -16,8 +16,7 @@ func readOutputFile(filename string) string {
 }
 
 func get_filename_and_format(url string) (string, string) {
-	println(url)
-	regex_str := "^http:\\/\\/.*?([a-z0-9]+)\\.(\\w+)$"
+	regex_str := "^https?:\\/\\/.*?([a-z0-9]+)\\.(\\w+)$"
 	regex := regexp.MustCompile(regex_str)
 	matches := regex.FindStringSubmatch(url)
 	return matches[1], matches[2]

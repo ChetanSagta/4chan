@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-
 	nethtml "golang.org/x/net/html"
 )
 
@@ -11,6 +10,9 @@ var URL = ""
 func parseBoard(body *nethtml.Node){
 
 	form := get_node_based_on_attr(body,"name","delform")
+	if form == nil {
+		form = get_node_based_on_attr(body,"id","delform")
+	}
 
 	threads := get_all_nodes_based_on_attr(form,"class", "thread");
 

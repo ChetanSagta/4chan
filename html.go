@@ -148,6 +148,9 @@ func get_file_url(root *html.Node) string{
 		return ""
 	}
 	href := get_child_tag(fileText_tag, "a")
-	url := "http:"+ get_attribute_value(href, "href")
+	url :=  get_attribute_value(href, "href")
+	if strings.HasPrefix(url, "https") == false {
+		url = "http:" + url;
+	}
 	return url
 }
